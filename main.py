@@ -1,3 +1,5 @@
+import bs4.element
+
 from spiders.fastcomet_spider import FastcometSpider
 from scrapy import signals
 from scrapy.crawler import CrawlerProcess
@@ -41,6 +43,7 @@ def extract_data_from_url():
 
     # Get data from each url
     for i, url in enumerate(urls_list):
+
         print(f"Processing {i+1}/{url_len}")
 
         # Get title of the url using bs4
@@ -56,7 +59,13 @@ def extract_data_from_url():
 
         # Get H1 tag of the url using bs4
         try:
-            h1 = soup.find('h1').text
+            h1 = soup.find_all('h1')
+            for tag in h1:
+                if "Web Hosting Deals" not in tag.text:
+                    h1 = tag.text
+            if isinstance(h1, bs4.element.ResultSet):
+                h1 = "Web Hosting Deals"
+
         except AttributeError:
             h1 = ''
 
@@ -67,7 +76,7 @@ def extract_data_from_url():
             except UnicodeEncodeError:
                 continue
 
-    print("Data successfully extracted and saved to data.csv")
+    print("Data successfully extracted and saved to data_old.csv")
 
 
 def main():
